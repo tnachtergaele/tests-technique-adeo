@@ -9,6 +9,7 @@ import java.util.List;
 @Transactional(readOnly = true)
 public interface EventRepository extends Repository<Event, Long> {
 
+    @Transactional
     void delete(Long eventId);
 
     List<Event> findAllBy();
