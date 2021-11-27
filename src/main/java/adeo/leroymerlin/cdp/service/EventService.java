@@ -44,8 +44,11 @@ public class EventService {
     public List<Event> getFilteredEvents(String query) {
         List<Event> events = eventRepository.findAllBy();
         // Filter the events list in pure JAVA here
-
-        return events;
+        List<Event> matchingEvents = events.stream().filter(event -> event.getBands().stream()
+                .anyMatch(band -> band.getMembers().stream()
+                        .anyMatch(member -> matchingMember(member, query))))
+                .collect(Collectors.toList());
+        return filteringEvents(matchingEvents, query);
     }
 
     List<Event> filteringEvents(List<Event> events, String query) {

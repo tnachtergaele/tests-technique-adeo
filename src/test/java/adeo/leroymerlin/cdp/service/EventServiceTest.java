@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class EventServiceTest {
 
@@ -35,6 +36,29 @@ public class EventServiceTest {
         Event expectedEventDownload = createEvent("Download Festival", expectedBandOffSpring);
 
         List<Event> filteredEvents = cut.filteringEvents(events, query);
+        assertThat(filteredEvents).containsOnly(expectedEventGrasPop, expectedEventDownload);
+    }
+
+    @Test
+    public void getFilteredEventsTest() {
+        Band bandMetallica = createBand("Metallica", "Queen Anika Walsh", "Queen Katy Stone", "Queen Aliyah Jarvis");
+        Band bandMegadeth = createBand("Megadeth", "Queen Haleema Poole");
+        Band bandOffSpring = createBand("Off Spring", "Queen Charlie Wolf (Chick)", "Queen Aaliyah York");
+        Band bandSum41 = createBand("Sum41", "Queen Gertrude Hudson", "Queen Madeleine Taylor");
+        Event eventGrasPop = createEvent("GrasPop Metal Meeting", bandMetallica, bandMegadeth);
+        Event eventDownload = createEvent("Download Festival", bandOffSpring);
+        Event eventMotocultor = createEvent("Motocultor", bandSum41);
+        List<Event> events = Arrays.asList(eventGrasPop, eventDownload, eventMotocultor);
+        when(eventRepository.findAllBy()).thenReturn(events);
+
+        String query = "li";
+
+        Band expectedBandMetallica = createBand("Metallica", "Queen Aliyah Jarvis");
+        Band expectedBandOffSpring = createBand("Off Spring", "Queen Charlie Wolf (Chick)", "Queen Aaliyah York");
+        Event expectedEventGrasPop = createEvent("GrasPop Metal Meeting", expectedBandMetallica);
+        Event expectedEventDownload = createEvent("Download Festival", expectedBandOffSpring);
+
+        List<Event> filteredEvents = cut.getFilteredEvents(query);
         assertThat(filteredEvents).containsOnly(expectedEventGrasPop, expectedEventDownload);
     }
 
