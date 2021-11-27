@@ -19,4 +19,6 @@ public interface EventRepository extends Repository<Event, Long> {
     Optional<Event> findById(Long id);
 
     List<Event> findAllBy();
+
+    List<Event> findDistinctByBands_Members_NameContaining(String query);
 }

@@ -28,6 +28,11 @@ public class EventController {
         return eventService.getFilteredEvents(query);
     }
 
+    @RequestMapping(value = "/search/v2/{query}", method = RequestMethod.GET)
+    public List<Event> findEventsByMember(@PathVariable String query) {
+        return eventService.getFilteredEventsByMember(query);
+    }
+
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public void deleteEvent(@PathVariable Long id) {
         eventService.delete(id);
