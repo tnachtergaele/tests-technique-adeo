@@ -53,13 +53,33 @@ public class EventServiceTest {
 
         String query = "li";
 
-        Band expectedBandMetallica = createBand("Metallica", "Queen Aliyah Jarvis");
-        Band expectedBandOffSpring = createBand("Off Spring", "Queen Charlie Wolf (Chick)", "Queen Aaliyah York");
-        Event expectedEventGrasPop = createEvent("GrasPop Metal Meeting", expectedBandMetallica);
-        Event expectedEventDownload = createEvent("Download Festival", expectedBandOffSpring);
+        Band expectedBandMetallica = createBand("Metallica [1]", "Queen Aliyah Jarvis");
+        Band expectedBandOffSpring = createBand("Off Spring [2]", "Queen Charlie Wolf (Chick)", "Queen Aaliyah York");
+        Event expectedEventGrasPop = createEvent("GrasPop Metal Meeting [1]", expectedBandMetallica);
+        Event expectedEventDownload = createEvent("Download Festival [1]", expectedBandOffSpring);
 
         List<Event> filteredEvents = cut.getFilteredEvents(query);
         assertThat(filteredEvents).containsOnly(expectedEventGrasPop, expectedEventDownload);
+    }
+
+    @Test
+    public void enrichWithChildItemsNumberTest() {
+        Band bandMetallica = createBand("Metallica", "Queen Anika Walsh", "Queen Katy Stone", "Queen Aliyah Jarvis");
+        Band bandMegadeth = createBand("Megadeth", "Queen Haleema Poole");
+        Band bandOffSpring = createBand("Off Spring", "Queen Charlie Wolf (Chick)", "Queen Aaliyah York");
+        Event eventGrasPop = createEvent("GrasPop Metal Meeting", bandMetallica, bandMegadeth);
+        Event eventDownload = createEvent("Download Festival", bandOffSpring);
+        List<Event> events = Arrays.asList(eventGrasPop, eventDownload);
+
+        Band expectedBandMetallica = createBand("Metallica [3]", "Queen Anika Walsh", "Queen Katy Stone", "Queen Aliyah Jarvis");
+        Band expectedBandMegadeth = createBand("Megadeth [1]", "Queen Haleema Poole");
+        Band expectedBandOffSpring = createBand("Off Spring [2]", "Queen Charlie Wolf (Chick)", "Queen Aaliyah York");
+        Event expectedEventGrasPop = createEvent("GrasPop Metal Meeting [2]", expectedBandMetallica, expectedBandMegadeth);
+        Event expectedEventDownload = createEvent("Download Festival [1]", expectedBandOffSpring);
+
+        List<Event> enrichEvents = cut.enrichWithChildItemsNumber(events);
+
+        assertThat(enrichEvents).containsOnly(expectedEventGrasPop, expectedEventDownload);
     }
 
     private static Event createEvent(String title, Band... bands) {

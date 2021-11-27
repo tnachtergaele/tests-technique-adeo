@@ -1,5 +1,6 @@
 package adeo.leroymerlin.cdp.service;
 
+import adeo.leroymerlin.cdp.entity.Band;
 import adeo.leroymerlin.cdp.entity.Event;
 import adeo.leroymerlin.cdp.entity.Member;
 import adeo.leroymerlin.cdp.repository.EventRepository;
@@ -38,7 +39,7 @@ public class EventService {
 
     public List<Event> getFilteredEventsByMember(String query) {
         List<Event> matchingEvents = eventRepository.findDistinctByBands_Members_NameContaining(query);
-        return filteringEvents(matchingEvents, query);
+        return enrichWithChildItemsNumber(filteringEvents(matchingEvents, query));
     }
 
     public List<Event> getFilteredEvents(String query) {
@@ -48,7 +49,7 @@ public class EventService {
                 .anyMatch(band -> band.getMembers().stream()
                         .anyMatch(member -> matchingMember(member, query))))
                 .collect(Collectors.toList());
-        return filteringEvents(matchingEvents, query);
+        return enrichWithChildItemsNumber(filteringEvents(matchingEvents, query));
     }
 
     List<Event> filteringEvents(List<Event> events, String query) {
@@ -66,6 +67,23 @@ public class EventService {
 
     private boolean matchingMember(Member member, String query) {
         return member.getName() != null && member.getName().contains(query);
+    }
+
+    List<Event> enrichWithChildItemsNumber(List<Event> events) {
+        events.forEach(event -> event.setTitle(concatNumberToString(event.getTitle(), event.getBands().size())));
+        events.forEach(event -> event.setBands(event.getBands().stream().map(this::enrichWithMembersNumber).collect(Collectors.toSet())));
+        return events;
+    }
+
+    private Band enrichWithMembersNumber(Band band) {
+        Band enrichBand = new Band();
+        enrichBand.setName(concatNumberToString(band.getName(), band.getMembers().size()));
+        enrichBand.setMembers(band.getMembers());
+        return enrichBand;
+    }
+
+    private String concatNumberToString(String string, int count) {
+        return String.format("%s [%d]", string, count);
     }
 
 }
