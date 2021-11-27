@@ -25,6 +25,15 @@ public class EventService {
         eventRepository.delete(id);
     }
 
+    public void saveEvent(Long id, Event event)  {
+        if(eventRepository.findById(id).isPresent()) {
+            Event eventToUpdate = eventRepository.findById(id).get();
+            eventToUpdate.setNbStars(event.getNbStars());
+            eventToUpdate.setComment(event.getComment());
+            eventRepository.save(eventToUpdate);
+        }
+    }
+
     public List<Event> getFilteredEvents(String query) {
         List<Event> events = eventRepository.findAllBy();
         // Filter the events list in pure JAVA here
